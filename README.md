@@ -1,177 +1,639 @@
-# 🧠 AvaliaMente - Sistema de Avaliação Infantil
+# 🦉 NEUROPLAY - PLANO DE FLUXOGRAMA PARA EXPORTAÇÃO
 
-> Sistema web voltado para ONGs e profissionais de psicopedagogia e desenvolvimento infantil.
-> Permite o cadastro de crianças e aplicação de formulários avaliativos por **avaliadores**, com acompanhamento da evolução em gráficos por categoria.
+## FORMATO Mermaid (GitHub, GitLab, Notion)
 
-## 🚀 Funcionalidades
+### 1. DIAGRAMA PRINCIPAL DO SISTEMA
 
-### 👑 **Administrador**
-- ✅ Gera e gerencia contas de avaliadores
-- ✅ Cadastra novas crianças
-- ✅ Visualiza relatórios gerais da ONG
-- ✅ Acompanha o progresso das avaliações em todas as categorias
-- ✅ Dashboard com estatísticas completas
-- ✅ Relatórios detalhados com filtros
-- ✅ **Gerenciamento completo de perguntas** (adicionar, editar, excluir)
-- ✅ **Visualização de todas as crianças** com filtros avançados
-
-### 🧑‍⚕️ **Avaliador**
-- ✅ Faz login no sistema
-- ✅ Acessa a lista de crianças que ele acompanha
-- ✅ Aplica formulários de avaliação (divididos por categorias)
-- ✅ Visualiza histórico de avaliações anteriores
-- ✅ Vê gráficos comparativos mostrando evolução da criança ao longo do tempo
-- ✅ **Gerenciamento de perguntas** (adicionar, editar, excluir)
-- ✅ **Visualização de todas as crianças** com filtros avançados
-
-## 🧱 **Categorias de Avaliação**
-
-1. **Socialização** - Interações sociais e convivência
-2. **Linguagem** - Comunicação e expressão verbal
-3. **Cognição** - Desenvolvimento cognitivo e aprendizado
-4. **Autocuidados** - Independência e cuidados pessoais
-5. **Desenvolvimento Motor** - Coordenação e habilidades motoras
-
-## 💻 **Tecnologias Utilizadas**
-
-| Área | Tecnologia |
-|------|------------|
-| Front-end | HTML5, CSS3, JavaScript, TailwindCSS |
-| Back-end | PHP 8+ |
-| Banco de Dados | MySQL 8+ |
-| Gráficos | Chart.js |
-| Autenticação | PHP Sessions |
-| Ícones | Font Awesome |
-
-## 📋 **Pré-requisitos**
-
-- PHP 8.0 ou superior
-- MySQL 8.0 ou superior
-- Servidor web (Apache/Nginx)
-- Extensões PHP: PDO, PDO_MySQL, JSON
-
-## 🛠️ **Instalação**
-
-### 1. Clone ou baixe o projeto
-```bash
-git clone [url-do-repositorio]
-# ou baixe o ZIP e extraia
+```mermaid
+graph TD
+    A[Usuário Acessa] --> B{Primeira Visita?}
+    B -->|Sim| C[Landing Page]
+    B -->|Não| D[Login]
+    C --> D
+    D --> E{Autenticação}
+    E -->|Sucesso| F[Dashboard]
+    E -->|Falha| D
+    F --> G{Tipo de Usuário}
+    G -->|Admin| H[Funcionalidades Admin]
+    G -->|Avaliador| I[Funcionalidades Avaliador]
+    
+    H --> J[Gerenciar Avaliadores]
+    H --> K[Gerenciar Crianças]
+    H --> L[Relatórios Gerais]
+    H --> M[Personalizar Sistema]
+    H --> N[Logs de Auditoria]
+    
+    I --> O[Minhas Crianças]
+    I --> P[Realizar Avaliações]
+    I --> Q[Histórico de Avaliações]
+    I --> R[Gerenciar Perguntas]
 ```
 
-### 2. Configure o banco de dados
-1. Crie um banco de dados MySQL chamado `avaliamente`
-2. Importe o arquivo `database.sql`:
-```sql
-mysql -u root -p avaliamente < database.sql
+### 2. FLUXO DE AVALIAÇÃO
+
+```mermaid
+flowchart TD
+    A[Selecionar Criança] --> B[Calcular Idade]
+    B --> C[Filtrar Perguntas por Idade]
+    C --> D[Apresentar Formulário]
+    D --> E[Coletar Respostas por Categoria]
+    E --> F[Socialização]
+    E --> G[Linguagem]
+    E --> H[Cognição]
+    E --> I[Autocuidados]
+    E --> J[Desenvolvimento Motor]
+    
+    F --> K[Calcular Estatísticas]
+    G --> K
+    H --> K
+    I --> K
+    J --> K
+    
+    K --> L[Salvar Avaliação]
+    L --> M[Gerar Relatório]
+    M --> N[Exibir Gráficos]
+    N --> O[Atualizar Dashboard]
 ```
 
-### 3. Configure a conexão
-Edite o arquivo `config/database.php` com suas credenciais:
-```php
-private $host = 'localhost';
-private $db_name = 'avaliamente';
-private $username = 'seu_usuario';
-private $password = 'sua_senha';
+### 3. ESTRUTURA DE DADOS
+
+```mermaid
+erDiagram
+    USUARIOS {
+        int id PK
+        string nome
+        string email
+        string senha
+        enum tipo
+        boolean ativo
+        timestamp criado_em
+    }
+    
+    CRIANCAS {
+        int id PK
+        string nome
+        date data_nascimento
+        string responsavel
+        string nome_mae
+        string nome_pai
+        text observacoes
+        int criado_por FK
+        boolean ativo
+        timestamp criado_em
+    }
+    
+    CATEGORIAS {
+        int id PK
+        int formulario_id FK
+        string nome_categoria
+        int ordem
+        boolean ativo
+    }
+    
+    PERGUNTAS {
+        int id PK
+        int categoria_id FK
+        text texto_pergunta
+        int faixa_etaria_min
+        int faixa_etaria_max
+        int ordem
+        boolean ativo
+    }
+    
+    AVALIACOES {
+        int id PK
+        int crianca_id FK
+        int avaliador_id FK
+        int formulario_id FK
+        timestamp data_avaliacao
+        text treino_sugerido
+        text observacoes
+        int total_perguntas
+        int total_acertos
+        decimal percentual_acerto
+        boolean aprovado
+    }
+    
+    RESPOSTAS {
+        int id PK
+        int avaliacao_id FK
+        int pergunta_id FK
+        decimal valor
+        text observacoes_categoria
+    }
+    
+    USUARIOS ||--o{ AVALIACOES : "realiza"
+    CRIANCAS ||--o{ AVALIACOES : "é avaliada"
+    CATEGORIAS ||--o{ PERGUNTAS : "contém"
+    AVALIACOES ||--o{ RESPOSTAS : "possui"
+    PERGUNTAS ||--o{ RESPOSTAS : "recebe"
 ```
 
-### 4. Configure permissões
-```bash
-chmod 755 logs/
-chmod 644 config/*.php
+## FORMATO Draw.io/Lucidchart (XML/JSON)
+
+### 4. ESTRUTURA XML PARA DRAW.IO
+
+```xml
+<mxfile>
+  <diagram name="NeuroPlay Sistema Principal">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Nós principais -->
+        <mxCell id="usuario" value="Usuário" style="ellipse;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="100" y="50" width="80" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="landing" value="Landing Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="250" y="50" width="100" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="login" value="Login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="400" y="50" width="80" height="40" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="dashboard" value="Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="550" y="50" width="100" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Decisão de tipo de usuário -->
+        <mxCell id="decisao" value="Tipo de Usuário?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="550" y="150" width="100" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Funcionalidades Admin -->
+        <mxCell id="admin" value="Admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="400" y="250" width="80" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Funcionalidades Avaliador -->
+        <mxCell id="avaliador" value="Avaliador" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="700" y="250" width="80" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Conexões -->
+        <mxCell id="edge1" edge="1" parent="1" source="usuario" target="landing">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="edge2" edge="1" parent="1" source="landing" target="login">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="edge3" edge="1" parent="1" source="login" target="dashboard">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="edge4" edge="1" parent="1" source="dashboard" target="decisao">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="edge5" edge="1" parent="1" source="decisao" target="admin">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <mxCell id="edge6" edge="1" parent="1" source="decisao" target="avaliador">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
 ```
 
-### 5. Acesse o sistema
-- URL: `http://localhost/avaliamentev1/`
-- **Admin padrão:**
-  - Email: `admin@avaliamente.com`
-  - Senha: `password`
+## FORMATO VISIO (VSDX)
 
-## 🔒 **Segurança Implementada**
+### 5. ESTRUTURA PARA VISIO
 
-- ✅ Senhas criptografadas com `password_hash()`
-- ✅ Proteção contra SQL Injection (PDO Prepared Statements)
-- ✅ Validação e sanitização de dados de entrada
-- ✅ Headers de segurança HTTP
-- ✅ Rate limiting para tentativas de login
-- ✅ Logs de auditoria e tentativas de acesso
-- ✅ Sessões seguras com timeout
-- ✅ Validação de permissões por tipo de usuário
+```json
+{
+  "visioDocument": {
+    "pages": [
+      {
+        "name": "NeuroPlay Sistema Principal",
+        "shapes": [
+          {
+            "id": "1",
+            "type": "ellipse",
+            "text": "Usuário",
+            "x": 100,
+            "y": 50,
+            "width": 80,
+            "height": 40,
+            "fillColor": "#e1d5e7",
+            "strokeColor": "#9673a6"
+          },
+          {
+            "id": "2",
+            "type": "rectangle",
+            "text": "Landing Page",
+            "x": 250,
+            "y": 50,
+            "width": 100,
+            "height": 40,
+            "fillColor": "#d5e8d4",
+            "strokeColor": "#82b366"
+          },
+          {
+            "id": "3",
+            "type": "rectangle",
+            "text": "Login",
+            "x": 400,
+            "y": 50,
+            "width": 80,
+            "height": 40,
+            "fillColor": "#fff2cc",
+            "strokeColor": "#d6b656"
+          },
+          {
+            "id": "4",
+            "type": "rectangle",
+            "text": "Dashboard",
+            "x": 550,
+            "y": 50,
+            "width": 100,
+            "height": 40,
+            "fillColor": "#dae8fc",
+            "strokeColor": "#6c8ebf"
+          },
+          {
+            "id": "5",
+            "type": "diamond",
+            "text": "Tipo de Usuário?",
+            "x": 550,
+            "y": 150,
+            "width": 100,
+            "height": 60,
+            "fillColor": "#ffe6cc",
+            "strokeColor": "#d79b00"
+          }
+        ],
+        "connectors": [
+          {
+            "from": "1",
+            "to": "2",
+            "label": "Acessa"
+          },
+          {
+            "from": "2",
+            "to": "3",
+            "label": "Navega"
+          },
+          {
+            "from": "3",
+            "to": "4",
+            "label": "Autentica"
+          },
+          {
+            "from": "4",
+            "to": "5",
+            "label": "Verifica"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
-## 📊 **Estrutura do Banco de Dados**
+## FORMATO BPMN 2.0
 
-### Tabelas principais:
-- `usuarios` - Administradores e avaliadores
-- `criancas` - Dados das crianças
-- `formularios` - Formulários de avaliação
-- `categorias` - Categorias de desenvolvimento
-- `perguntas` - Perguntas por categoria
-- `avaliacoes` - Registros de avaliações
-- `respostas` - Respostas das avaliações
-- `avaliador_crianca` - Relacionamento avaliador-criança
+### 6. PROCESSO DE AVALIAÇÃO EM BPMN
 
-## 🎨 **Design e UX**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <bpmn:process id="ProcessoAvaliacao" name="Processo de Avaliação NeuroPlay">
+    
+    <!-- Evento de início -->
+    <bpmn:startEvent id="StartEvent" name="Início da Avaliação">
+      <bpmn:outgoing>Flow1</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <!-- Tarefa: Selecionar Criança -->
+    <bpmn:task id="Task1" name="Selecionar Criança">
+      <bpmn:incoming>Flow1</bpmn:incoming>
+      <bpmn:outgoing>Flow2</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Tarefa: Calcular Idade -->
+    <bpmn:task id="Task2" name="Calcular Idade">
+      <bpmn:incoming>Flow2</bpmn:incoming>
+      <bpmn:outgoing>Flow3</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Gateway: Verificar se há perguntas -->
+    <bpmn:exclusiveGateway id="Gateway1" name="Há perguntas para esta idade?">
+      <bpmn:incoming>Flow3</bpmn:incoming>
+      <bpmn:outgoing>Flow4</bpmn:outgoing>
+      <bpmn:outgoing>Flow5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <!-- Tarefa: Realizar Avaliação -->
+    <bpmn:task id="Task3" name="Realizar Avaliação">
+      <bpmn:incoming>Flow4</bpmn:incoming>
+      <bpmn:outgoing>Flow6</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Tarefa: Calcular Resultados -->
+    <bpmn:task id="Task4" name="Calcular Resultados">
+      <bpmn:incoming>Flow6</bpmn:incoming>
+      <bpmn:outgoing>Flow7</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Tarefa: Salvar Avaliação -->
+    <bpmn:task id="Task5" name="Salvar Avaliação">
+      <bpmn:incoming>Flow7</bpmn:incoming>
+      <bpmn:outgoing>Flow8</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Evento de fim -->
+    <bpmn:endEvent id="EndEvent" name="Avaliação Concluída">
+      <bpmn:incoming>Flow8</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Fluxos -->
+    <bpmn:sequenceFlow id="Flow1" sourceRef="StartEvent" targetRef="Task1"/>
+    <bpmn:sequenceFlow id="Flow2" sourceRef="Task1" targetRef="Task2"/>
+    <bpmn:sequenceFlow id="Flow3" sourceRef="Task2" targetRef="Gateway1"/>
+    <bpmn:sequenceFlow id="Flow4" sourceRef="Gateway1" targetRef="Task3" name="Sim"/>
+    <bpmn:sequenceFlow id="Flow5" sourceRef="Gateway1" targetRef="EndEvent" name="Não"/>
+    <bpmn:sequenceFlow id="Flow6" sourceRef="Task3" targetRef="Task4"/>
+    <bpmn:sequenceFlow id="Flow7" sourceRef="Task4" targetRef="Task5"/>
+    <bpmn:sequenceFlow id="Flow8" sourceRef="Task5" targetRef="EndEvent"/>
+    
+  </bpmn:process>
+</bpmn:definitions>
+```
 
-- **Visual:** Clean e acolhedor, inspirado no Google Forms + Notion
-- **Cores:** Azul (#3B82F6), Verde (#10B981), Vermelho (#EF4444)
-- **Responsivo:** Funciona em desktop, tablet e mobile
-- **Acessibilidade:** Contraste adequado e navegação por teclado
+## FORMATO PlantUML
 
-## 📈 **Gráficos e Relatórios**
+### 7. DIAGRAMA DE ATIVIDADES
 
-- **Chart.js** para visualizações interativas
-- Gráficos de evolução por categoria
-- Comparativo primeira vs última avaliação
-- Relatórios administrativos com filtros
-- Estatísticas de uso do sistema
-- **Sistema completo de gerenciamento de perguntas**
+```plantuml
+@startuml NeuroPlay Activity Diagram
+!theme plain
+skinparam activity {
+  BackgroundColor #E1F5FE
+  BorderColor #01579B
+  FontColor #000000
+}
 
-## 🔧 **Configurações Avançadas**
+start
+:Usuário acessa o sistema;
+if (Primeira visita?) then (sim)
+  :Exibir Landing Page;
+else (não)
+  :Redirecionar para Login;
+endif
 
-### Logs
-- `logs/audit.log` - Log de auditoria
-- `logs/login_attempts.log` - Tentativas de login
-- `logs/rate_limit.json` - Controle de rate limiting
+:Realizar Login;
+if (Autenticação válida?) then (sim)
+  :Acessar Dashboard;
+  if (Tipo de usuário?) then (Admin)
+    :Gerenciar Avaliadores;
+    :Gerenciar Crianças;
+    :Visualizar Relatórios Gerais;
+    :Personalizar Sistema;
+    :Acessar Logs de Auditoria;
+  else (Avaliador)
+    :Visualizar Minhas Crianças;
+    :Realizar Avaliações;
+    :Visualizar Histórico;
+    :Gerenciar Perguntas;
+  endif
+else (não)
+  :Exibir erro de login;
+  stop
+endif
 
-### Personalização
-- Edite `config/database.php` para configurações do banco
-- Modifique `config/security.php` para configurações de segurança
-- Ajuste perguntas em `database.sql` conforme necessário
+stop
+@enduml
+```
 
-## 🚀 **Deploy em Produção**
+### 8. DIAGRAMA DE SEQUÊNCIA - PROCESSO DE AVALIAÇÃO
 
-### Recomendações:
-1. Use HTTPS (certificado SSL)
-2. Configure `session.cookie_secure = 1`
-3. Configure backup automático do banco
-4. Monitore logs regularmente
-5. Mantenha PHP e MySQL atualizados
+```plantuml
+@startuml NeuroPlay Sequence Diagram
+!theme plain
 
-### Hospedagem sugerida:
-- **Gratuita:** InfinityFree (PHP + MySQL)
-- **Paga:** Hostinger, Locaweb, DigitalOcean
-- **Cloud:** Vercel, Deta Space (com adaptações)
+actor Usuário as U
+participant "Interface Web" as I
+participant "Sistema PHP" as P
+participant "Banco MySQL" as B
 
-## 📞 **Suporte**
+U -> I: Seleciona criança para avaliar
+I -> P: Envia ID da criança
+P -> B: Busca dados da criança
+B --> P: Retorna dados
+P -> P: Calcula idade da criança
+P -> B: Busca perguntas por faixa etária
+B --> P: Retorna perguntas filtradas
+P --> I: Exibe formulário de avaliação
 
-Para dúvidas ou problemas:
-1. Verifique os logs em `logs/`
-2. Confirme as configurações do banco
-3. Verifique permissões de arquivo
-4. Consulte a documentação do PHP/MySQL
+U -> I: Preenche respostas
+I -> P: Envia respostas
+P -> P: Calcula estatísticas
+P -> B: Salva avaliação
+B --> P: Confirma salvamento
+P -> B: Salva respostas individuais
+B --> P: Confirma salvamento
+P --> I: Exibe confirmação
+I --> U: Mostra resultado da avaliação
 
-## 🔄 **Atualizações Futuras**
+@enduml
+```
 
-- [ ] Exportação de relatórios em PDF
-- [ ] Notificações por email
-- [ ] API REST para integrações
-- [ ] App mobile (React Native/Flutter)
-- [ ] Backup automático na nuvem
-- [ ] Múltiplos formulários personalizáveis
+## FORMATO C4 Model
 
-## 📄 **Licença**
+### 9. DIAGRAMA DE CONTEXTO
 
-Este projeto é de código aberto e pode ser usado livremente para fins educacionais e comerciais.
+```mermaid
+C4Context
+    title Sistema NeuroPlay - Diagrama de Contexto
+    
+    Person(usuario, "Usuário", "Admin ou Avaliador do sistema")
+    Person(responsavel, "Responsável", "Pai/Mãe da criança")
+    
+    System(neuroplay, "NeuroPlay", "Sistema de avaliação do desenvolvimento infantil")
+    
+    System_Ext(banco, "MySQL Database", "Banco de dados para persistência")
+    System_Ext(servidor, "Servidor Web", "Apache/Nginx com PHP")
+    
+    Rel(usuario, neuroplay, "Usa", "HTTPS")
+    Rel(responsavel, neuroplay, "Cadastra criança", "HTTPS")
+    Rel(neuroplay, banco, "Persiste dados", "SQL")
+    Rel(neuroplay, servidor, "Executa em", "PHP")
+```
+
+### 10. DIAGRAMA DE CONTAINER
+
+```mermaid
+C4Container
+    title NeuroPlay - Diagrama de Container
+    
+    Person(usuario, "Usuário", "Admin ou Avaliador")
+    
+    Container_Boundary(sistema, "Sistema NeuroPlay") {
+        Container(web, "Aplicação Web", "PHP 8+", "Interface do usuário")
+        Container(api, "API Backend", "PHP 8+", "Lógica de negócio")
+        ContainerDb(db, "Banco de Dados", "MySQL 8+", "Dados do sistema")
+    }
+    
+    Rel(usuario, web, "Usa", "HTTPS")
+    Rel(web, api, "Chama", "HTTP")
+    Rel(api, db, "Persiste", "SQL")
+```
+
+## FORMATO PARA LUCIDCHART
+
+### 11. ESTRUTURA JSON PARA LUCIDCHART
+
+```json
+{
+  "version": "1.0",
+  "title": "NeuroPlay - Sistema de Avaliação Infantil",
+  "pages": [
+    {
+      "id": "page1",
+      "name": "Fluxo Principal",
+      "shapes": [
+        {
+          "id": "start",
+          "type": "ellipse",
+          "x": 100,
+          "y": 100,
+          "width": 80,
+          "height": 40,
+          "text": "Início",
+          "style": {
+            "fill": "#E8F5E8",
+            "stroke": "#4CAF50"
+          }
+        },
+        {
+          "id": "landing",
+          "type": "rectangle",
+          "x": 250,
+          "y": 100,
+          "width": 120,
+          "height": 50,
+          "text": "Landing Page",
+          "style": {
+            "fill": "#E3F2FD",
+            "stroke": "#2196F3"
+          }
+        },
+        {
+          "id": "login",
+          "type": "rectangle",
+          "x": 400,
+          "y": 100,
+          "width": 100,
+          "height": 50,
+          "text": "Login",
+          "style": {
+            "fill": "#FFF3E0",
+            "stroke": "#FF9800"
+          }
+        },
+        {
+          "id": "dashboard",
+          "type": "rectangle",
+          "x": 550,
+          "y": 100,
+          "width": 120,
+          "height": 50,
+          "text": "Dashboard",
+          "style": {
+            "fill": "#F3E5F5",
+            "stroke": "#9C27B0"
+          }
+        },
+        {
+          "id": "decisao",
+          "type": "diamond",
+          "x": 550,
+          "y": 200,
+          "width": 120,
+          "height": 80,
+          "text": "Tipo de\nUsuário?",
+          "style": {
+            "fill": "#FFECB3",
+            "stroke": "#FFC107"
+          }
+        }
+      ],
+      "connectors": [
+        {
+          "id": "conn1",
+          "from": "start",
+          "to": "landing",
+          "label": "Acessa"
+        },
+        {
+          "id": "conn2",
+          "from": "landing",
+          "to": "login",
+          "label": "Navega"
+        },
+        {
+          "id": "conn3",
+          "from": "login",
+          "to": "dashboard",
+          "label": "Autentica"
+        },
+        {
+          "id": "conn4",
+          "from": "dashboard",
+          "to": "decisao",
+          "label": "Verifica"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## INSTRUÇÕES DE EXPORTAÇÃO
+
+### Para Mermaid:
+1. Copie o código Mermaid
+2. Cole em: https://mermaid.live/ ou GitHub/GitLab
+3. Exporte como PNG, SVG ou PDF
+
+### Para Draw.io:
+1. Acesse: https://app.diagrams.net/
+2. Importe o XML fornecido
+3. Edite conforme necessário
+4. Exporte como PNG, PDF, SVG, etc.
+
+### Para Lucidchart:
+1. Acesse: https://www.lucidchart.com/
+2. Crie novo documento
+3. Importe o JSON fornecido
+4. Personalize e exporte
+
+### Para Visio:
+1. Abra Microsoft Visio
+2. Crie novo diagrama
+3. Use o JSON como referência
+4. Exporte como VSDX, PNG, PDF
+
+### Para PlantUML:
+1. Acesse: http://www.plantuml.com/plantuml/
+2. Cole o código PlantUML
+3. Gere a imagem
+4. Exporte como PNG, SVG, PDF
+
+### Para BPMN:
+1. Use ferramentas como: Camunda Modeler, Bizagi Modeler
+2. Importe o XML BPMN 2.0
+3. Edite e exporte
 
 ---
 
-**Desenvolvido com ❤️ para o desenvolvimento infantil**
+**NOTA:** Este arquivo contém todos os formatos necessários para criar fluxogramas profissionais do sistema NeuroPlay em diferentes plataformas. Escolha o formato mais adequado para sua ferramenta de preferência.
